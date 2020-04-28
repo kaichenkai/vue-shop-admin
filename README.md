@@ -365,8 +365,8 @@ axios.interceptors.request.use(config => {
   const Bar = () => import(/* webpackChunkName: "group-foo" */ './Bar.vue')
   const Baz = () => import(/* webpackChunkName: "group-foo" */ './Baz.vue')
   
-  // import Login from '../components/Login.vue'
-  const Login = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Login.vue')
+  Loginaaa.vue
+  const Login = () => import(/* webpackChunkName: "login_home_welcome" */ Loginaaa.vue)
   // import Home from '../components/Home.vue'
   const Home = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Home.vue')
   // import Welcome from '../components/Welcome.vue'

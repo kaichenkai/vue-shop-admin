@@ -7,7 +7,13 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: import("../views/Home.vue")
+    component: () => import("../views/Home.vue")
+  },
+  {
+    path: "/login",
+    name: "login",
+    // component: import("../views/Login.vue")  // 错误写法: template or render function not defined.
+    component: () => import("../views/Login.vue")
   }
 ];
 
