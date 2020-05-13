@@ -27,6 +27,8 @@ HttpServer.install = (Vue) => {
   // })
 
   // 4. 添加实例方法
+  // 设置 baseUrl
+  axios.defaults.baseURL = "http://localhost:8888/api/private/v1/";
   Vue.prototype.$http = axios;
   // Vue.prototype.$http = () => import("axios")
 };
