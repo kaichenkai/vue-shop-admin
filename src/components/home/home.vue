@@ -194,6 +194,7 @@
                     background-color: #d3dce6;
 
                     .el-menu {
+                        border: none;
                         height: 100%;
 
                         .el-submenu {
