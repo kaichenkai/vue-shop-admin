@@ -1,15 +1,21 @@
 <template>
-  <div class="home">
-      <home />
+  <div class="home-view">
+      <Home />
   </div>
 </template>
 
 <script>
-import home from "../components/home/home"
+import Home from "../components/home/home.vue"
 export default {
-  name: "Home",
+  name: "HomeView",
   components: {
-    home
+    Home
   }
 };
 </script>
+
+<style lang="less" scoped>
+    .home-view {
+        height: 100%;
+    }
+</style>

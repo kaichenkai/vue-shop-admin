@@ -17,6 +17,8 @@ import "@/assets/css/base.css"
 import HttpServer from "@/plugins/http";
 Vue.use(HttpServer);
 
+// 导入字体图标
+import './assets/fonts/iconfont.css'
 
 Vue.config.productionTip = false;
 

@@ -7,7 +7,7 @@
 <script>
     import login from "../components/login/login"
     export default {
-        name: "Login",
+        name: "LoginView",
         components: {
             login
         }

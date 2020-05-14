@@ -42,8 +42,10 @@
                 // 希望让异步操作的代码, 看起来像同步代码, ES7 的语法
                 const resp = await this.$http.post("login", this.formData);
                 // 对象解构赋值
-                const {msg, status} = resp.data.meta;
+                const {data, meta:{msg, status}} = resp.data;
                 if (status === 200) {
+                  // 0. 保存 token 值
+                  localStorage.setItem("token", data.token);
                   // 1. 提示登录成功
                   this.$message.success(msg);
                   // 2. 跳转到 home 页面
