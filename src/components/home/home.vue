@@ -208,7 +208,7 @@
             }
 
             .el-container {
-                height: 100%;
+                height: calc(100% - 60px);
 
                 .el-aside {
                     background-color: #d3dce6;
