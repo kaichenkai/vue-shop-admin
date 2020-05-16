@@ -15,7 +15,7 @@
                     </el-col>
                     <el-col :span="2">
                         <div class="grid-content bg-purple head-bottom">
-                            <a href="#">退出</a>
+                            <a href="#" @click.prevent="handleLogout()">退出</a>
                         </div>
                     </el-col>
                 </el-row>
@@ -25,7 +25,9 @@
                     <!--                            @open="handleOpen"-->
                     <!--                            @close="handleClose"-->
                     <el-menu
-                            default-active="2"
+                            :unique-opened="true"
+                            :router="true"
+                            default-active="/user/list"
                             background-color="#545c64"
                             text-color="#fff"
                             active-text-color="#ffd04b">   <!--默认选中-->
@@ -34,7 +36,7 @@
                                 <i :class="iconObj[125]"></i>
                                 <span>用户管理</span>
                             </template>
-                            <el-menu-item index="1-1">
+                            <el-menu-item index="/user/list">
                                 <i class="el-icon-menu"></i>
                                 <span>用户列表</span>
                             </el-menu-item>
@@ -108,7 +110,9 @@
 
                     </el-menu>
                 </el-aside>
-                <el-main>Main</el-main>
+                <el-main>
+                    <router-view></router-view>
+                </el-main>
             </el-container>
         </el-container>
     </div>
@@ -117,6 +121,14 @@
 <script>
   export default {
     name: "home",
+    beforeCreate() {
+      // 如果没有 token 值, 就不渲染 home 组件
+      // new Vue() 之前触发
+      const token = localStorage.getItem("token");
+      if (!token) {
+        this.$router.push({name: "login"})
+      }
+    },
     data() {
       return {
         iconObj: {
@@ -135,6 +147,14 @@
       },
       handleClose(key, keyPath) {
         console.log(key, keyPath);
+      },
+      handleLogout() {
+        // 退出, 删除 token
+        localStorage.removeItem("token");
+        // 提示
+        this.$message.success("退出登录");
+        // 返回 login 组件
+        this.$router.push({name: "login"})
       }
     }
   };

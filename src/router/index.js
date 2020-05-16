@@ -7,7 +7,7 @@ const routes = [
   {
     path: "/",
     name: "root",
-    redirect: { name: "login" }
+    redirect: { name: "home" }
   },
   {
     path: "/login",
@@ -18,7 +18,15 @@ const routes = [
   {
     path: "/home",
     name: "home",
-    component: () => import("../views/Home.vue")
+    component: () => import("../views/Home.vue"),
+    redirect: {name: "user"},
+    children: [
+      {
+        path: "/user",
+        name: "user",
+        component: () => import("../components/users/user.vue")
+      }
+    ]
   }
 ];
 
