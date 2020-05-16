@@ -28,8 +28,8 @@
             return {
                 labelPosition: 'top',  // 顶部对齐
                 formData: {
-                    username: '',
-                    password: ''
+                    username: 'admin',
+                    password: '123456'
                 }
             };
         },
@@ -40,7 +40,7 @@
         methods: {
             async login() {
                 // 希望让异步操作的代码, 看起来像同步代码, ES7 的语法
-                const resp = await this.$http.post("login", this.formData);
+                const resp = await this._service.post("login", this.formData);
                 // 对象解构赋值
                 const {data, meta:{msg, status}} = resp.data;
                 if (status === 200) {
