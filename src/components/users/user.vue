@@ -8,8 +8,14 @@
         <!--搜索框-->
         <el-row>
             <el-col :span=10 class="search">
-                <el-input placeholder="请输入内容" v-model="searchContent" class="input-with-select">
-                    <el-button slot="append" icon="el-icon-search"></el-button>
+                <el-input
+                        placeholder="请输入内容"
+                        v-model="searchContent"
+                        clearable
+                        @clear="loadUserList()"
+                        class="input-with-select"
+                >
+                    <el-button slot="append" icon="el-icon-search" @click.prevent="searchUser()"></el-button>
                 </el-input>
             </el-col>
             <!--添加用户-->
@@ -42,6 +48,10 @@
             <el-table-column
                     prop="mobile"
                     label="电话">
+            </el-table-column>
+            <el-table-column
+                    prop="role_name"
+                    label="角色">
             </el-table-column>
 
             <!--prop="create_time"-->
@@ -80,7 +90,7 @@
             </el-table-column>
         </el-table>
         <!--分页-->
-<!--        @size-change="handleSizeChange"-->
+        <!--        @size-change="handleSizeChange"-->
         <el-pagination
                 @current-change="handleCurrentChange"
                 :background="true"
@@ -102,8 +112,8 @@
         searchContent: "",
         userList: [],
         // 分页相关数据
-        pagenum: 2,
-        pagesize: 2,
+        pagenum: 1,
+        pagesize: 4,
         totalpage: 0,
         total: 0
       };
@@ -137,6 +147,16 @@
       // },
       handleCurrentChange(pagenum) {
         this.pagenum = pagenum;
+        this.getUserList();
+      },
+
+      // 用户搜索
+      searchUser() {
+        this.getUserList();
+      },
+
+      // 清空搜索框触发
+      loadUserList() {
         this.getUserList();
       }
     }
