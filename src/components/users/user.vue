@@ -20,7 +20,7 @@
             </el-col>
             <!--添加用户-->
             <el-col :span=10 class="add-user">
-                <el-button type="primary">添加用户</el-button>
+                <el-button type="primary" @click.prevent="showAddUserDialog()">添加用户</el-button>
             </el-col>
         </el-row>
         <!--表格数据渲染-->
@@ -80,12 +80,23 @@
                 </template>
             </el-table-column>
             <el-table-column
-                    prop="operation"
                     label="操作">
-                <template>
-                    <el-button size="mini" type="primary" icon="el-icon-edit" circle></el-button>
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="primary"
+                            icon="el-icon-edit"
+                            circle
+                            @click="showEditUserDialog(scope.row.id)"
+                    ></el-button>
                     <el-button size="mini" type="success" icon="el-icon-check" circle></el-button>
-                    <el-button size="mini" type="danger" icon="el-icon-delete" circle></el-button>
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            icon="el-icon-delete"
+                            circle
+                            @click="showDelUserDialog(scope.row.id)"
+                    ></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -101,6 +112,56 @@
                 class="pagenation"
         >
         </el-pagination>
+
+        <!--添加用户对话框-->
+        <el-dialog
+                title="添加用户"
+                :visible.sync="addUserDialogVisible"
+                width="30%"
+                center>
+            <el-form label-position="left" label-width="80px" :model="addUserForm">
+                <el-form-item label="姓名:">
+                    <el-input v-model="addUserForm.username" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="密码:">
+                    <el-input v-model="addUserForm.password" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱:">
+                    <el-input v-model="addUserForm.email" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="电话:">
+                    <el-input v-model="addUserForm.mobile" clearable></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addUserDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addUser()">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <!--编辑用户对话框-->
+        <el-dialog
+                title="编辑用户"
+                :visible.sync="editUserDialogVisible"
+                width="30%"
+                center>
+            <el-form label-position="left" label-width="80px" :model="editUserForm">
+                <el-form-item label="姓名:">
+                    <el-input v-model="editUserForm.username" clearable disabled></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱:">
+                    <el-input v-model="editUserForm.email" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="电话:">
+                    <el-input v-model="editUserForm.mobile" clearable></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editUserDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="updateUser(editUserForm.id)">确 定</el-button>
+            </span>
+        </el-dialog>
+
     </el-card>
 </template>
 
@@ -115,7 +176,25 @@
         pagenum: 1,
         pagesize: 4,
         totalpage: 0,
-        total: 0
+        total: 0,
+
+        // 添加用户对话框
+        addUserDialogVisible: false,
+        addUserForm: {
+          username: "",
+          password: "",
+          email: "",
+          mobile: ""
+        },
+
+        // 编辑用户对话框
+        editUserDialogVisible: false,
+        editUserForm: {
+          id: "",
+          username: "",
+          email: "",
+          mobile: ""
+        }
       };
     },
     mounted() {
@@ -158,10 +237,104 @@
       // 清空搜索框触发
       loadUserList() {
         this.getUserList();
+      },
+
+      // 显示添加用户对话框
+      showAddUserDialog() {
+        this.addUserDialogVisible = true;
+      },
+      // 添加用户
+      async addUser() {
+        const resp = await this._service.post("users", this.addUserForm);
+        const { meta: { msg, status } } = resp.data;
+        switch (status) {
+          case 201: {
+            // 提示信息
+            this.$message.success(msg);
+            // 清除对话框内容
+            this.addUserForm = {
+              username: "",
+              password: "",
+              email: "",
+              mobile: ""
+            };
+            // 重新加载数据
+            this.getUserList();
+            // 关闭对话框
+            this.addUserDialogVisible = false;
+            break;
+          }
+          case 400: {
+            this.$message.warning(msg);
+            break;
+          }
+          default: {
+            this.$message.error(msg);
+          }
+        }
+      },
+
+      // 显示删除用户对话框 + 删除用户
+      showDelUserDialog(userId) {
+        this.$confirm("删除用户?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(async () => {
+          const resp = await this._service.delete(`users/${userId}`);
+          const { meta: { msg, status } } = resp.data;
+          if (status === 200) {
+            this.$message.success(msg);
+            // 重新加载用户列表
+            this.getUserList();
+          } else {
+            this.$message.error(msg);
+          }
+        }).catch(() => {
+          this.$message.info("已取消删除");
+        });
+      },
+
+      // 显示编辑用户对话框
+      async showEditUserDialog(userId) {
+        // 显示对话框
+        this.editUserDialogVisible = true;
+        // 请求当前用户数据
+        const resp = await this._service.get(`users/${userId}`);
+        const { data, meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          this.editUserForm.id = data.id;
+          this.editUserForm.username = data.username;
+          this.editUserForm.email = data.email;
+          this.editUserForm.mobile = data.mobile;
+        } else {
+          this.$message.error(msg);
+        }
+      },
+      // 更新用户信息
+      async updateUser(userId) {
+        const resp = await this._service.put(`users/${userId}`, this.editUserForm);
+        const { meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          // 提示信息
+          this.$message.success(msg);
+          // 清除对话框内容
+          this.editUserForm = {
+            id: "",
+            username: "",
+            email: "",
+            mobile: ""
+          };
+          // 重新加载 userList
+          this.getUserList();
+          // 关闭对话框
+          this.editUserDialogVisible = false;
+        } else {
+          this.$message.error(msg);
+        }
       }
     }
   };
-
 </script>
 
 <style scoped lang="less">
