@@ -19,7 +19,7 @@
         </el-row>
         <!--表格数据渲染-->
         <el-table
-                :data="tableData"
+                :data="userList"
                 height="calc(100% - 114px)"
                 style="width: 100%; font-size: 14px"
                 class="box-table"
@@ -42,17 +42,40 @@
                     prop="mobile"
                     label="电话">
             </el-table-column>
+
+            <!--prop="create_time"-->
             <el-table-column
-                    prop="create_time"
                     label="创建日期">
+                <!--如果单元格内显示的内容不是文本字符串
+                需要给被显示的内容外层包裹一个 template 标签-->
+
+                <!--template 内部要用数据, 设置 slot-scope 属性
+                该属性的值是要用数据的数据源的key-->
+
+                <!--slot-scope 的值 userList 其实就是 el-table 绑定的数据 userList,
+                userList.row -> 数组中的每个具体对象-->
+                <template slot-scope="scope">
+                    {{scope.row.creat_time | formatDate("YYYY-MM-DD")}}
+                </template>
             </el-table-column>
             <el-table-column
-                    prop="mg_state"
                     label="用户状态">
+                <template slot-scope="scope">
+                    <el-switch
+                            v-model="scope.row.mg_state"
+                            active-color="#409EFF"
+                            inactive-color="#DCDFE6">
+                    </el-switch>
+                </template>
             </el-table-column>
             <el-table-column
                     prop="operation"
                     label="操作">
+                <template>
+                    <el-button size="mini" type="primary" icon="el-icon-edit" circle></el-button>
+                    <el-button size="mini" type="success" icon="el-icon-check" circle></el-button>
+                    <el-button size="mini" type="danger" icon="el-icon-delete" circle></el-button>
+                </template>
             </el-table-column>
         </el-table>
     </el-card>
@@ -64,13 +87,15 @@
     data() {
       return {
         searchContent: "",
-        pagenum:1,
+        userList: [],
+        // 分页相关数据
+        pagenum: 1,
         pagesize: 50,
-        tableData: []
+        total: 0
       };
     },
     mounted() {
-        this.getUserList()
+      this.getUserList();
     },
     methods: {
       async getUserList() {
@@ -79,14 +104,17 @@
         const AUTH_TOKEN = localStorage.getItem("token");
         this._service.defaults.headers.common["Authorization"] = AUTH_TOKEN;
         const resp = await this._service.get(`users?query=${this.searchContent}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
-        const { data, meta:{ msg, status } } = resp.data;
+        const { data: { users, total }, meta: { msg, status } } = resp.data;
         if (status !== 200) {
-          this.$message.error(msg)
-        } else  {
-          this.tableData = data.users;
+          this.$message.warning(msg);
+        } else {
+          this.userList = users;
+          this.total = total;
+          // 提示获取用户列表数据成功
+          this.$message.success(msg);
         }
       }
-    },
+    }
   };
 
 </script>
@@ -116,6 +144,6 @@
     更改 element-ui 样式
      */
     .el-card .el-card__body {
-        height: 100%;  // 滚动条
+        height: 100%; // 滚动条
     }
 </style>

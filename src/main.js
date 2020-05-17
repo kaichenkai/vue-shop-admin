@@ -23,6 +23,13 @@ import './assets/fonts/iconfont.css'
 Vue.config.productionTip = false;
 
 
+// 全局过滤器 - 处理日期
+import moment from "moment";
+Vue.filter("formatDate", (v, formatType) => {
+  // return moment(v).format("YYYY-MM-DD")
+  return moment(v).format(formatType)
+});
+
 new Vue({
   router,
   render: h => h(App)
