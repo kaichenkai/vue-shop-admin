@@ -18,9 +18,10 @@
             </el-col>
         </el-row>
         <!--表格数据渲染-->
+        <!--                        height="calc(100% - 114px)"-->
         <el-table
                 :data="userList"
-                height="calc(100% - 114px)"
+                height="calc(100% - 214px)"
                 style="width: 100%; font-size: 14px"
                 class="box-table"
         >
@@ -78,6 +79,18 @@
                 </template>
             </el-table-column>
         </el-table>
+        <!--分页-->
+<!--        @size-change="handleSizeChange"-->
+        <el-pagination
+                @current-change="handleCurrentChange"
+                :background="true"
+                layout="total, prev, pager, next, jumper"
+                :current-page="pagenum"
+                :page-size="pagesize"
+                :total="total"
+                class="pagenation"
+        >
+        </el-pagination>
     </el-card>
 </template>
 
@@ -89,8 +102,9 @@
         searchContent: "",
         userList: [],
         // 分页相关数据
-        pagenum: 1,
-        pagesize: 50,
+        pagenum: 2,
+        pagesize: 2,
+        totalpage: 0,
         total: 0
       };
     },
@@ -104,15 +118,26 @@
         const AUTH_TOKEN = localStorage.getItem("token");
         this._service.defaults.headers.common["Authorization"] = AUTH_TOKEN;
         const resp = await this._service.get(`users?query=${this.searchContent}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
-        const { data: { users, total }, meta: { msg, status } } = resp.data;
+        const { data: { users, total, pagenum, totalpage }, meta: { msg, status } } = resp.data;
         if (status !== 200) {
           this.$message.warning(msg);
         } else {
           this.userList = users;
           this.total = total;
+          this.pagenum = pagenum;
+          this.totalpage = totalpage;
           // 提示获取用户列表数据成功
           this.$message.success(msg);
         }
+      },
+
+      // 分页相关方法
+      // handleSizeChange(val) {
+      //   console.log(`每页 ${val} 条`);
+      // },
+      handleCurrentChange(pagenum) {
+        this.pagenum = pagenum;
+        this.getUserList();
       }
     }
   };
@@ -135,6 +160,10 @@
 
         .box-table {
             margin-top: 20px;
+        }
+
+        .pagenation {
+            margin: 34px 0;
         }
     }
 </style>
