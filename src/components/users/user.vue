@@ -73,6 +73,7 @@
                     label="用户状态">
                 <template slot-scope="scope">
                     <el-switch
+                            @change="changeUserStatus(scope.row)"
                             v-model="scope.row.mg_state"
                             active-color="#409EFF"
                             inactive-color="#DCDFE6">
@@ -332,7 +333,22 @@
         } else {
           this.$message.error(msg);
         }
-      }
+      },
+
+      // 改变用户状态 users/:uId/state/:type
+      async changeUserStatus(userObj) {
+        const resp = await this._service.put(`users/${userObj.id}/state/${userObj.mg_state}`);
+        console.log(resp);
+        const { meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          // 提示信息
+          this.$message.success(msg);
+          // 不需要重新加载,  v-model="mg_state" 视图改变数据, 数据返过来影响视图(双向绑定)
+          // this.getUserList();
+        } else {
+          this.$message.error(msg);
+        }
+      },
     }
   };
 </script>
