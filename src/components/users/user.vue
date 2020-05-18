@@ -90,7 +90,15 @@
                             circle
                             @click="showEditUserDialog(scope.row.id)"
                     ></el-button>
-                    <el-button size="mini" type="success" icon="el-icon-check" circle></el-button>
+                    <!--设置用户权限-->
+                    <el-button
+                            size="mini"
+                            type="success"
+                            icon="el-icon-check"
+                            circle
+                            @click="showSetUserRole(scope.row)"
+                    >
+                    </el-button>
                     <el-button
                             size="mini"
                             type="danger"
@@ -163,6 +171,40 @@
             </span>
         </el-dialog>
 
+        <!--设置用户权限对话框-->
+        <el-dialog
+                title="设置用户权限"
+                :visible.sync="setUserRoleDialogVisible"
+                width="40%"
+                left
+                class="user-role-dialog"
+        >
+            <el-form label-position="left" width="80%" :model="userRoleForm" class="user-role-form">
+                <el-form-item class="user-role">
+                    <label>当前用户:<span>{{userRoleForm.username}}</span></label>
+                </el-form-item>
+                <el-form-item class="user-role">
+                    <label>当前角色:<span>{{userRoleForm.rolename}}</span></label>
+                </el-form-item>
+                <el-form-item class="user-role">
+                    <label>分配角色:
+                        <el-select v-model="currentRole" placeholder="请选择">
+                            <el-option
+                                    v-for="item in userRoleForm.roleOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                    :disabled="item.disabled">
+                            </el-option>
+                        </el-select>
+                    </label>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="setUserRoleDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="showSetUserRole()">确 定</el-button>
+            </span>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -195,6 +237,15 @@
           username: "",
           email: "",
           mobile: ""
+        },
+
+        // 用户角色对话框
+        setUserRoleDialogVisible: false,
+        currentRole: "",
+        userRoleForm: {
+          username: "",
+          rolename: "",
+          roleOptions: []
         }
       };
     },
@@ -349,6 +400,32 @@
           this.$message.error(msg);
         }
       },
+
+      // 显示用户角色对话框
+      async showSetUserRole(userObj) {
+        this.setUserRoleDialogVisible = true;
+        // 显示当前用户权限信息
+        this.userRoleForm["username"] = userObj.username;
+        this.userRoleForm["rolename"] = userObj.role_name;
+        // 获取角色列表  users/:id/role
+        const resp = await this._service.get(`roles`);
+        const { data, meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          // 给 userRoleForm 赋值
+          for (const roleObj of data) {
+            let tempRole = new Object({
+              value: roleObj.id,
+              label: roleObj.roleName
+            });
+            this.userRoleForm["roleOptions"].push(tempRole);
+          }
+          // 提示成功
+          // this.$message.success(msg);
+        } else {
+          this.$message.error(msg);
+        }
+      }
+      // 设置用户权限
     }
   };
 </script>
@@ -373,6 +450,21 @@
 
         .pagenation {
             margin: 34px 0;
+        }
+
+        .user-role-dialog {
+            .user-role-form {
+                .user-role {
+                    label {
+                        span {
+                            margin-left: 15px;
+                        }
+                        .el-select {
+                            margin-left: 15px;
+                        }
+                    }
+                }
+            }
         }
     }
 </style>
