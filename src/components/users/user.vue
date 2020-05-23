@@ -173,7 +173,7 @@
 
         <!--设置用户权限对话框-->
         <el-dialog
-                title="设置用户权限"
+                title="设置用户角色"
                 :visible.sync="setUserRoleDialogVisible"
                 width="40%"
                 left
@@ -188,12 +188,14 @@
                 </el-form-item>
                 <el-form-item class="user-role">
                     <label>分配角色:
-                        <el-select v-model="currentRole" placeholder="请选择">
+                        <!--select 绑定的数据的值, 和 option 的 label 值一样-->
+                        <!--如果 select 绑定的数据的值, 和 option 的 value 值一样, 此时显示的是该 option 的label 值-->
+                        <el-select v-model="currentRoleId" placeholder="请选择">
                             <el-option
                                     v-for="item in userRoleForm.roleOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
+                                    :key="item.roleId"
+                                    :label="item.roleName"
+                                    :value="item.roleId"
                                     :disabled="item.disabled">
                             </el-option>
                         </el-select>
@@ -202,7 +204,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="setUserRoleDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="showSetUserRole()">确 定</el-button>
+                <el-button type="primary" @click="setUserRole(userRoleForm.id)">确 定</el-button>
             </span>
         </el-dialog>
     </el-card>
@@ -241,8 +243,9 @@
 
         // 用户角色对话框
         setUserRoleDialogVisible: false,
-        currentRole: "",
+        currentRoleId: "",
         userRoleForm: {
+          id: "",
           username: "",
           rolename: "",
           roleOptions: []
@@ -251,6 +254,12 @@
     },
     mounted() {
       this.getUserList();
+    },
+    filters: {
+      // formatterRoleName(value) {
+      //   console.log(value);
+      //   return value === 0? "超级管理员": value;
+      // }
     },
     methods: {
       async getUserList() {
@@ -404,9 +413,21 @@
       // 显示用户角色对话框
       async showSetUserRole(userObj) {
         this.setUserRoleDialogVisible = true;
+        // 清空角色选项列表
+        this.userRoleForm.roleOptions = [];
         // 显示当前用户权限信息
-        this.userRoleForm["username"] = userObj.username;
-        this.userRoleForm["rolename"] = userObj.role_name;
+        this.userRoleForm.id = userObj.id;
+        this.userRoleForm.username = userObj.username;
+        this.userRoleForm.rolename = userObj.role_name;
+        // 获取当前用户的 rid : users/:id
+        const res = await this._service.get(`users/${userObj.id}`);
+        const { rid } = res.data.data;
+        if (rid === 0) { // 超级管理员
+          this.currentRoleId = userObj.role_name;
+        } else { // 一般用户
+          this.currentRoleId = rid;
+        }
+
         // 获取角色列表  users/:id/role
         const resp = await this._service.get(`roles`);
         const { data, meta: { msg, status } } = resp.data;
@@ -414,18 +435,36 @@
           // 给 userRoleForm 赋值
           for (const roleObj of data) {
             let tempRole = new Object({
-              value: roleObj.id,
-              label: roleObj.roleName
+              roleId: roleObj.id,
+              roleName: roleObj.roleName,
+              roleDesc: roleObj.roleDesc,
+              disabled: false
             });
-            this.userRoleForm["roleOptions"].push(tempRole);
+            this.userRoleForm.roleOptions.push(tempRole);
           }
           // 提示成功
           // this.$message.success(msg);
         } else {
           this.$message.error(msg);
         }
+      },
+      // 设置用户角色: users/:id/role
+      async setUserRole(userId) {
+        const resp = await this._service.put(`users/${userId}/role`, { rid: this.currentRoleId });
+        const { meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          // 清空 userRoleForm.roleOptions
+          this.userRoleForm.roleOptions = [];
+          // 退出对话框
+          this.setUserRoleDialogVisible = false;
+          // 重载用户列表信息
+          this.getUserList();
+          // 提示成功
+          this.$message.success(msg);
+        } else {
+          this.$message.error(msg);
+        }
       }
-      // 设置用户权限
     }
   };
 </script>
@@ -459,6 +498,7 @@
                         span {
                             margin-left: 15px;
                         }
+
                         .el-select {
                             margin-left: 15px;
                         }
