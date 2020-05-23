@@ -2,8 +2,8 @@
     <el-card class="box-card">
         <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item :to="{name: 'user'}">首页</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{name: 'user'}">用户管理</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{name: 'user'}">用户列表</el-breadcrumb-item>
+            <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+            <el-breadcrumb-item>用户列表</el-breadcrumb-item>
         </el-breadcrumb>
         <!--搜索框-->
         <el-row>
@@ -265,8 +265,8 @@
       async getUserList() {
         // 模板字符串 (``)
         // 需要授权的 API ，必须在请求头中使用 `Authorization` 字段提供 `token` 令牌
-        const AUTH_TOKEN = localStorage.getItem("token");
-        this._service.defaults.headers.common["Authorization"] = AUTH_TOKEN;
+        // const AUTH_TOKEN = localStorage.getItem("token");
+        // this._service.defaults.headers.common["Authorization"] = AUTH_TOKEN;
         const resp = await this._service.get(`users?query=${this.searchContent}&pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
         const { data: { users, total, pagenum, totalpage }, meta: { msg, status } } = resp.data;
         if (status !== 200) {
