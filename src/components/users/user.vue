@@ -204,7 +204,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="setUserRoleDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="setUserRole(userRoleForm.id)">确 定</el-button>
+                <el-button type="primary" @click="setUserRole">确 定</el-button>
             </span>
         </el-dialog>
     </el-card>
@@ -245,7 +245,7 @@
         setUserRoleDialogVisible: false,
         currentRoleId: "",
         userRoleForm: {
-          id: "",
+          id: "",  // userId
           username: "",
           rolename: "",
           roleOptions: []
@@ -449,8 +449,8 @@
         }
       },
       // 设置用户角色: users/:id/role
-      async setUserRole(userId) {
-        const resp = await this._service.put(`users/${userId}/role`, { rid: this.currentRoleId });
+      async setUserRole() {
+        const resp = await this._service.put(`users/${this.userRoleForm.id}/role`, { rid: this.currentRoleId });
         const { meta: { msg, status } } = resp.data;
         if (status === 200) {
           // 清空 userRoleForm.roleOptions
