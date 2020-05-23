@@ -514,6 +514,6 @@
     更改 element-ui 样式
      */
     .el-card .el-card__body {
-        height: 100%; // 滚动条
+        height: 100% !important; // 滚动条
     }
 </style>
