@@ -27,7 +27,7 @@
                     <el-menu
                             :unique-opened="true"
                             :router="true"
-                            default-active="/rights"
+                            default-active="/role"
                             background-color="#545c64"
                             text-color="#fff"
                             active-text-color="#ffd04b">   <!--默认选中-->
@@ -57,7 +57,7 @@
                                 <i :class="iconObj[103]"></i>
                                 <span>权限管理</span>
                             </template>
-                            <el-menu-item index="/roles">
+                            <el-menu-item index="/role">
                                 <i class="el-icon-menu"></i>
                                 <span>角色列表</span>
                             </el-menu-item>

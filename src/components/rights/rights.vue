@@ -49,8 +49,6 @@
     },
     mounted() {
       this.getRightsList();
-
-      // 改变样式
     },
     filters: {
       // formatterLevel(value) {
@@ -74,7 +72,6 @@
         const { data, meta: { msg, status } } = resp.data;
         if (status === 200) {
           this.rightsList = data;
-          console.log(data);
           this.$message.success(msg);
         } else {
           this.$message.error(msg);
