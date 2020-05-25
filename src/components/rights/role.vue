@@ -29,7 +29,7 @@
                         <el-col :span="4">
                             <el-tag type="success"
                                     closable
-                                    @close="deleteRights(scope.row.id, item1.id)"
+                                    @close="deleteRights(scope.row, item1.id)"
                             >{{item1.authName}}
                             </el-tag>
                             <i class="el-icon-caret-right"></i>
@@ -40,7 +40,7 @@
                                 <el-col :span="4">
                                     <el-tag
                                             closable
-                                            @close="deleteRights(scope.row.id, item2.id)"
+                                            @close="deleteRights(scope.row, item2.id)"
                                     >{{item2.authName}}
                                     </el-tag>
                                     <i class="el-icon-caret-right"></i>
@@ -50,7 +50,7 @@
                                     <el-col>
                                         <el-tag
                                                 closable
-                                                @close="deleteRights(scope.row.id, item3.id)"
+                                                @close="deleteRights(scope.row, item3.id)"
                                                 style="margin-right: 5px"
                                                 type="warning"
                                                 v-for="(item3, index) in item2.children"
@@ -83,14 +83,50 @@
             </el-table-column>
             <el-table-column
                     label="操作">
-                <!--                slot-scope="scope"-->
-                <template>
+                <template slot-scope="scope">
                     <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
                     <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
-                    <el-button type="warning" icon="el-icon-setting" size="mini">分配权限</el-button>
+                    <el-button
+                            type="warning"
+                            icon="el-icon-setting"
+                            size="mini"
+                            @click="showAddUserDialog(scope.row)"
+                    >分配权限
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
+
+        <!--分配权限对话框-->
+        <el-dialog
+                title="提示"
+                :visible.sync="showSetRightsDialogVisible"
+                width="30%">
+            <!--
+            树形控件
+            rightsList: 数据源 []
+            show-checkbox: 选择框
+            default-expanded-keys: 默认展开的节点 id
+            default-checked-keys: 要选择的节点 id
+            props: 配置项 {label, children}
+                label: 文字标题
+                children: 子节点的key名
+            -->
+
+            <!--               :default-expanded-keys="expandedKeys"-->
+            <el-tree
+                    :data="rightsList"
+                    show-checkbox
+                    node-key="id"
+                    :default-expand-all="true"
+                    :default-checked-keys="checkedKeys"
+                    :props="defaultProps">
+            </el-tree>
+            <span slot="footer" class="dialog-footer">
+            <el-button @click="showSetRightsDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="showSetRightsDialogVisible = false">确 定</el-button>
+          </span>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -99,7 +135,16 @@
     name: "role",
     data() {
       return {
-        roleList: []
+        showSetRightsDialogVisible: false,
+        roleList: [],
+        // 树形控件属性
+        rightsList: [],
+        expandedKeys: [],
+        checkedKeys: [],
+        defaultProps: {
+          label: "authName",
+          children: "children"
+        }
       };
     },
     mounted() {
@@ -111,8 +156,24 @@
         const resp = await this._service.get("roles");
         const { data, meta: { msg, status } } = resp.data;
         if (status === 200) {
-          console.log(data);
           this.roleList = data;
+          // // 权限列表 (这里的数据为什么不能用做树形图展示呢 ?)
+          // for (const role1 of data) {
+          //   // 第一层
+          //   const rights = role1.children;
+          //   this.rightsList.push(rights[0]);
+          //   // 第二层
+          //   for (const role2 in this.rightsList[0].children) {
+          //     const rights = role2.children;
+          //     this.rightsList.push(rights[0]);
+          //     // 第三层
+          //     for (const role3 in this.rightsList[0].children) {
+          //       const rights = role3.children;
+          //       this.rightsList.push(rights[0]);
+          //     }
+          //   }
+          // }
+          // console.log(this.rightsList);
           this.$message.success(msg);
         } else {
           this.$message.error(msg);
@@ -120,25 +181,56 @@
       },
 
       // 删除权限: roles/:roleId/rights/:rightId
-      async deleteRights(roleId, rightsId) {
-        console.log(roleId);
-        console.log(rightsId);
-        const resp = await this._service.delete(`roles/${roleId}/rights/${rightsId}`);
-        const {data, meta: {msg, status}} = resp.data;
+      async deleteRights(role, rightsId) {
+        const resp = await this._service.delete(`roles/${role.id}/rights/${rightsId}`);
+        const { data, meta: { msg, status } } = resp.data;
         if (status === 200) {
           // 更新权限列表数据, 找到对应的 role, 将data设置给 children 属性
-          for (const role of this.roleList) {
-            if (role.id === roleId) {
-              role.children = data;
-            }
-          }
-          this.$message.success(msg)
+          // data 是该角色的一, 二, 三级权限
+          role.children = data;
+          this.$message.success(msg);
         } else {
-          this.$message.error(msg)
+          this.$message.error(msg);
+        }
+      },
+
+      // 显示分配权限对话框
+      async showAddUserDialog(role) {
+        this.showSetRightsDialogVisible = true;
+        // 获取权限列表: rights/:type type: list(列表形式) tree(树状图形式)
+        const resp = await this._service.get("rights/tree");
+        const { data, meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          this.rightsList = data;
+          // 默认展开所有权限
+          // data.forEach((item1) => {
+          //   this.expandedKeys.push(item1.id);
+          //   item1.children.forEach((item2) => {
+          //     this.expandedKeys.push(item2.id);
+          //     item2.children.forEach((item3) => {
+          //       this.expandedKeys.push(item3.id);
+          //     });
+          //   });
+          // });
+          // console.log(this.expandedKeys);
+
+          // 获取已设置权限的 id 值
+          role.children.forEach(item1 => {
+            this.checkedKeys.push(item1.id);
+            item1.children.forEach(item2 => {
+              this.checkedKeys.push(item2.id);
+              item2.children.forEach(item3 => {
+                this.checkedKeys.push(item3.id);
+              });
+            });
+          });
+          console.log(this.checkedKeys);
+        } else {
+          this.$message.error(msg);
         }
       }
     }
-  }
+  };
 </script>
 
 <style scoped lang="less">
