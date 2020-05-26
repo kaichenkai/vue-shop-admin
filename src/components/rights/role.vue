@@ -90,7 +90,7 @@
                             type="warning"
                             icon="el-icon-setting"
                             size="mini"
-                            @click="showAddUserDialog(scope.row)"
+                            @click="showSetRightsDialog(scope.row)"
                     >分配权限
                     </el-button>
                 </template>
@@ -115,6 +115,7 @@
 
             <!--               :default-expanded-keys="expandedKeys"-->
             <el-tree
+                    ref="tree"
                     :data="rightsList"
                     show-checkbox
                     node-key="id"
@@ -124,7 +125,7 @@
             </el-tree>
             <span slot="footer" class="dialog-footer">
             <el-button @click="showSetRightsDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="showSetRightsDialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="setRights()">确 定</el-button>
           </span>
         </el-dialog>
     </el-card>
@@ -138,6 +139,7 @@
         showSetRightsDialogVisible: false,
         roleList: [],
         // 树形控件属性
+        currentRoleId: -1,
         rightsList: [],
         expandedKeys: [],
         checkedKeys: [],
@@ -195,8 +197,10 @@
       },
 
       // 显示分配权限对话框
-      async showAddUserDialog(role) {
+      async showSetRightsDialog(role) {
         this.showSetRightsDialogVisible = true;
+        this.checkedKeys = [];
+        this.currentRoleId = role.id;
         // 获取权限列表: rights/:type type: list(列表形式) tree(树状图形式)
         const resp = await this._service.get("rights/tree");
         const { data, meta: { msg, status } } = resp.data;
@@ -214,20 +218,42 @@
           // });
           // console.log(this.expandedKeys);
 
-          // 获取已设置权限的 id 值
+          // 获取已设置权限的 id 值 (3级权限全部勾选, 则2级选线自动勾选, 一级权限同理)
           role.children.forEach(item1 => {
-            this.checkedKeys.push(item1.id);
+            // this.checkedKeys.push(item1.id);
             item1.children.forEach(item2 => {
-              this.checkedKeys.push(item2.id);
+              // this.checkedKeys.push(item2.id);
               item2.children.forEach(item3 => {
                 this.checkedKeys.push(item3.id);
               });
             });
           });
-          console.log(this.checkedKeys);
+          // console.log(this.checkedKeys);
         } else {
           this.$message.error(msg);
         }
+      },
+
+      // 分配权限: roles/:roleId/rights
+      async setRights() {
+        // 1.获取全选的节点 id 数组: getCheckedKeys()
+        // 2.获取半选的节点 id 数组: getHalfCheckedKeys()
+        // 使用el-tree 标签对象调用方法
+        // ES-6: 展开运算符, 将两个数组拼接在一起
+        let arr1 = this.$refs.tree.getCheckedKeys();
+        let arr2 = this.$refs.tree.getHalfCheckedKeys();
+        let rids = [...arr1, ...arr2];
+        const resp = this._service.post(`roles/${this.currentRoleId}/rights`, {rids: rids.toString()});
+        console.log(resp);
+        this.getRoleList();
+        this.showSetRightsDialogVisible = false;
+        // const {meta: {msg, status}} = resp.data;
+        // if (status === 200) {
+        //   this.showSetRightsDialogVisible = false;
+        //   this.$message.success(msg);
+        // } else {
+        //   this.$message.error(msg);
+        // }
       }
     }
   };
