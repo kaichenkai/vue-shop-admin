@@ -22,8 +22,8 @@ const routes = [
     redirect: { name: "rights" },
     children: [
       {
-        path: "/user",
-        name: "user",
+        path: "/users",
+        name: "users",
         component: () => import("../components/users/user.vue")
       },
       {
@@ -32,8 +32,8 @@ const routes = [
         component: () => import("../components/rights/rights.vue")
       },
       {
-        path: "/role",
-        name: "role",
+        path: "/roles",
+        name: "roles",
         component: () => import("../components/rights/role.vue")
       }
     ]

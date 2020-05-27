@@ -20,93 +20,89 @@
                     </el-col>
                 </el-row>
             </el-header>
+            <!-- 主体 -->
             <el-container>
+                <!-- 侧边栏 -->
                 <el-aside :style="{width:'200px', height:'100%'}">
                     <!--                            @open="handleOpen"-->
                     <!--                            @close="handleClose"-->
                     <el-menu
                             :unique-opened="true"
                             :router="true"
-                            default-active="/role"
+                            default-active="roles"
                             background-color="#545c64"
                             text-color="#fff"
                             active-text-color="#ffd04b">   <!--默认选中-->
-                        <el-submenu index="1">
+                        <!--一级菜单-->
+                        <el-submenu :index="item1.path" v-for="(item1, index1) in MenuList" :key="index1">
                             <template slot="title">
-                                <i :class="iconObj[125]"></i>
-                                <span>用户管理</span>
+                                <i :class="iconObj[item1.id]"></i>
+                                <span>{{item1.authName}}</span>
                             </template>
-                            <el-menu-item index="/user">
+                            <!-- 导航开启路由模式：
+                                将index值作为导航路由 -->
+                            <!-- 二级菜单的模板区域 -->
+                            <el-menu-item :index="item2.path" v-for="(item2, index2) in item1.children" :key="index2">
                                 <i class="el-icon-menu"></i>
-                                <span>用户列表</span>
+                                <span>{{item2.authName}}</span>
                             </el-menu-item>
-                            <!--                            <el-submenu index="1-2">-->
-                            <!--                                <template slot="title">-->
-                            <!--                                    <i class="el-icon-menu"></i>-->
-                            <!--                                    <span>选项四</span>-->
-                            <!--                                </template>-->
-                            <!--                                <el-menu-item index="1-2-1">-->
-                            <!--                                    <i class="el-icon-menu"></i>-->
-                            <!--                                    <span>选项4-1</span>-->
-                            <!--                                </el-menu-item>-->
-                            <!--                            </el-submenu>-->
                         </el-submenu>
                         <!--<2>-->
-                        <el-submenu index="2">
-                            <template slot="title">
-                                <i :class="iconObj[103]"></i>
-                                <span>权限管理</span>
-                            </template>
-                            <el-menu-item index="/role">
-                                <i class="el-icon-menu"></i>
-                                <span>角色列表</span>
-                            </el-menu-item>
-                            <el-menu-item index="/rights">
-                                <i class="el-icon-menu"></i>
-                                <span>权限列表</span>
-                            </el-menu-item>
-                        </el-submenu>
-                        <!--<3>-->
-                        <el-submenu index="3">
-                            <template slot="title">
-                                <i :class="iconObj[101]"></i>
-                                <span>商品管理</span>
-                            </template>
-                            <el-menu-item index="3-1">
-                                <i class="el-icon-menu"></i>
-                                <span>商品列表</span>
-                            </el-menu-item>
-                            <el-menu-item index="3-2">
-                                <i class="el-icon-menu"></i>
-                                <span>分类参数</span>
-                            </el-menu-item>
-                            <el-menu-item index="3-3">
-                                <i class="el-icon-menu"></i>
-                                <span>商品分类</span>
-                            </el-menu-item>
-                        </el-submenu>
-                        <!--<4>-->
-                        <el-submenu index="4">
-                            <template slot="title">
-                                <i :class="iconObj[102]"></i>
-                                <span>订单管理</span>
-                            </template>
-                            <el-menu-item index="4-1">
-                                <i class="el-icon-menu"></i>
-                                <span>订单列表</span>
-                            </el-menu-item>
-                        </el-submenu>
-                        <!--<5>-->
-                        <el-submenu index="5">
-                            <template slot="title">
-                                <i :class="iconObj[145]"></i>
-                                <span>数据统计</span>
-                            </template>
-                            <el-menu-item index="5-1">
-                                <i class="el-icon-menu"></i>
-                                <span>数据报表</span>
-                            </el-menu-item>
-                        </el-submenu>
+                        <!--                        <el-submenu index="2">-->
+                        <!--                            <template slot="title">-->
+                        <!--                                <i :class="iconObj[103]"></i>-->
+                        <!--                                <span>权限管理</span>-->
+                        <!--                            </template>-->
+                        <!--                            <el-menu-item index="/role">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>角色列表</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                            <el-menu-item index="/rights">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>权限列表</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                        </el-submenu>-->
+                        <!--                        &lt;!&ndash;<3>&ndash;&gt;-->
+                        <!--                        <el-submenu index="3">-->
+                        <!--                            <template slot="title">-->
+                        <!--                                <i :class="iconObj[101]"></i>-->
+                        <!--                                <span>商品管理</span>-->
+                        <!--                            </template>-->
+                        <!--                            <el-menu-item index="3-1">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>商品列表</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                            <el-menu-item index="3-2">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>分类参数</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                            <el-menu-item index="3-3">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>商品分类</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                        </el-submenu>-->
+                        <!--                        &lt;!&ndash;<4>&ndash;&gt;-->
+                        <!--                        <el-submenu index="4">-->
+                        <!--                            <template slot="title">-->
+                        <!--                                <i :class="iconObj[102]"></i>-->
+                        <!--                                <span>订单管理</span>-->
+                        <!--                            </template>-->
+                        <!--                            <el-menu-item index="4-1">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>订单列表</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                        </el-submenu>-->
+                        <!--                        &lt;!&ndash;<5>&ndash;&gt;-->
+                        <!--                        <el-submenu index="5">-->
+                        <!--                            <template slot="title">-->
+                        <!--                                <i :class="iconObj[145]"></i>-->
+                        <!--                                <span>数据统计</span>-->
+                        <!--                            </template>-->
+                        <!--                            <el-menu-item index="5-1">-->
+                        <!--                                <i class="el-icon-menu"></i>-->
+                        <!--                                <span>数据报表</span>-->
+                        <!--                            </el-menu-item>-->
+                        <!--                        </el-submenu>-->
 
                     </el-menu>
                 </el-aside>
@@ -126,11 +122,12 @@
       // new Vue() 之前触发
       const token = localStorage.getItem("token");
       if (!token) {
-        this.$router.push({name: "login"})
+        this.$router.push({ name: "login" });
       }
     },
     data() {
       return {
+        MenuList: [],//菜单列表
         iconObj: {
           "125": "iconfont icon-user",
           "103": "iconfont icon-tijikongjian",
@@ -141,6 +138,10 @@
       };
 
     },
+    mounted() {
+      this.getMenuList();
+    },
+
     methods: {
       handleOpen(key, keyPath) {
         console.log(key, keyPath);
@@ -154,7 +155,18 @@
         // 提示
         this.$message.success("退出登录");
         // 返回 login 组件
-        this.$router.push({name: "login"})
+        this.$router.push({ name: "login" });
+      },
+
+      // 获取导航菜单
+      async getMenuList() {
+        const resp = await this._service.get(`menus`);
+        const { data, meta: { status, msg } } = resp.data;
+        if (status === 200) {
+          this.MenuList = data;
+        } else {
+          this.$message.error(msg);
+        }
       }
     }
   };
