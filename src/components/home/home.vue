@@ -29,10 +29,10 @@
                     <el-menu
                             :unique-opened="true"
                             :router="true"
-                            default-active="roles"
-                            background-color="#545c64"
+                            :default-active="activePath"
+                            background-color="#333744"
                             text-color="#fff"
-                            active-text-color="#ffd04b">   <!--默认选中-->
+                            active-text-color="#409FFF">   <!--默认选中-->
                         <!--一级菜单-->
                         <el-submenu :index="item1.path" v-for="(item1, index1) in MenuList" :key="index1">
                             <template slot="title">
@@ -128,6 +128,7 @@
     data() {
       return {
         MenuList: [],//菜单列表
+        activePath: "roles",//默认激活导航
         iconObj: {
           "125": "iconfont icon-user",
           "103": "iconfont icon-tijikongjian",
