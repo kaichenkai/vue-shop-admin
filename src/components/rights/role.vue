@@ -85,7 +85,12 @@
                     label="操作">
                 <template slot-scope="scope">
                     <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
-                    <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+                    <el-button
+                            type="danger"
+                            icon="el-icon-delete"
+                            size="mini"
+                            @click="showDelRoleDialog(scope.row)"
+                    >删除</el-button>
                     <el-button
                             type="warning"
                             icon="el-icon-setting"
@@ -176,11 +181,33 @@
       this.getRoleList();
     },
     methods: {
+      // 显示删除角色对话框 + 删除删除
+      showDelRoleDialog(role) {
+        this.$confirm("此操作将永久删除角色?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(async () => {
+          const resp = await this._service.delete(`roles/${role.id}`);
+          const { meta: { msg, status } } = resp.data;
+          if (status === 200) {
+            this.$message.success(msg);
+            // 重新加载角色列表
+            this.getRoleList();
+          } else {
+            this.$message.error(msg);
+          }
+        }).catch(() => {
+          this.$message.info("已取消删除");
+        });
+      },
+
+
       // 显示添加角色对话框
       showAddRoleDialog() {
         this.showAddRoleDialogVisible = true;
       },
-
+      // 添加角色
       async addRole() {
         const resp = await this._service.post(`roles`, this.addRoleFrom);
         const { meta: { status, msg } } = resp.data;
