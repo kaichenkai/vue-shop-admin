@@ -8,7 +8,7 @@
 
         <!--添加角色-->
         <el-col :span=10 class="add-role">
-            <el-button type="primary">添加角色</el-button>
+            <el-button type="primary" @click="showAddRoleDialog()">添加角色</el-button>
         </el-col>
 
         <!--表格数据-->
@@ -128,6 +128,26 @@
             <el-button type="primary" @click="setRights()">确 定</el-button>
           </span>
         </el-dialog>
+
+        <!--添加角色对话框-->
+        <el-dialog
+                title="添加角色"
+                :visible.sync="showAddRoleDialogVisible"
+                width="30%"
+                center>
+            <el-form label-position="left" label-width="80px" :model="addRoleFrom">
+                <el-form-item label="角色名称:">
+                    <el-input v-model="addRoleFrom.roleName" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="角色描述:">
+                    <el-input v-model="addRoleFrom.roleDesc" clearable></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showAddRoleDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addRole()">确 定</el-button>
+            </span>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -136,7 +156,10 @@
     name: "role",
     data() {
       return {
-        showSetRightsDialogVisible: false,
+        showAddRoleDialogVisible: false,//显示添加角色对话框
+        showSetRightsDialogVisible: false,//显示分配权限对话框
+        //添加角色表单数据
+        addRoleFrom: {},
         roleList: [],
         // 树形控件属性
         currentRoleId: -1,
@@ -153,6 +176,24 @@
       this.getRoleList();
     },
     methods: {
+      // 显示添加角色对话框
+      showAddRoleDialog() {
+        this.showAddRoleDialogVisible = true;
+      },
+
+      async addRole() {
+        const resp = await this._service.post(`roles`, this.addRoleFrom);
+        const { meta: { status, msg } } = resp.data;
+        if (status === 201) {
+          this.addRoleFrom = {};
+          this.showAddRoleDialogVisible = false;
+          this.getRoleList();
+          this.$message.success(msg);
+        } else {
+          this.$message.error(msg);
+        }
+      },
+
       // 获取角色列表: roles
       async getRoleList() {
         const resp = await this._service.get("roles");
@@ -243,7 +284,7 @@
         let arr1 = this.$refs.tree.getCheckedKeys();
         let arr2 = this.$refs.tree.getHalfCheckedKeys();
         let rids = [...arr1, ...arr2];
-        const resp = this._service.post(`roles/${this.currentRoleId}/rights`, {rids: rids.toString()});
+        const resp = this._service.post(`roles/${this.currentRoleId}/rights`, { rids: rids.toString() });
         console.log(resp);
         this.getRoleList();
         this.showSetRightsDialogVisible = false;
