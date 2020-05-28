@@ -84,13 +84,20 @@
             <el-table-column
                     label="操作">
                 <template slot-scope="scope">
-                    <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+                    <el-button
+                            type="primary"
+                            icon="el-icon-edit"
+                            size="mini"
+                            @click="showEditUserDialog(scope.row)"
+                    >编辑
+                    </el-button>
                     <el-button
                             type="danger"
                             icon="el-icon-delete"
                             size="mini"
                             @click="showDelRoleDialog(scope.row)"
-                    >删除</el-button>
+                    >删除
+                    </el-button>
                     <el-button
                             type="warning"
                             icon="el-icon-setting"
@@ -153,6 +160,26 @@
                 <el-button type="primary" @click="addRole()">确 定</el-button>
             </span>
         </el-dialog>
+
+        <!--编辑角色对话框-->
+        <el-dialog
+                title="编辑角色"
+                :visible.sync="showEditRoleDialogVisible"
+                width="30%"
+                center>
+            <el-form label-position="left" label-width="80px" :model="editRoleFrom">
+                <el-form-item label="角色名称:">
+                    <el-input v-model="editRoleFrom.roleName" clearable></el-input>
+                </el-form-item>
+                <el-form-item label="角色描述:">
+                    <el-input v-model="editRoleFrom.roleDesc" clearable></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showEditRoleDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="updateRole()">确 定</el-button>
+            </span>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -161,11 +188,16 @@
     name: "role",
     data() {
       return {
+        roleList: [],
         showAddRoleDialogVisible: false,//显示添加角色对话框
         showSetRightsDialogVisible: false,//显示分配权限对话框
-        //添加角色表单数据
-        addRoleFrom: {},
-        roleList: [],
+        showEditRoleDialogVisible: false,//显示编辑角色对话框
+        addRoleFrom: {},//添加角色表单数据
+        editRoleFrom: {
+          rid: -1,
+          roleName: "",
+          roleDesc: ""
+        },//编辑角色表单数据
         // 树形控件属性
         currentRoleId: -1,
         rightsList: [],
@@ -181,7 +213,45 @@
       this.getRoleList();
     },
     methods: {
-      // 显示删除角色对话框 + 删除删除
+      // 显示编辑角色对话框
+      async showEditUserDialog(role) {
+        // 显示对话框
+        this.showEditRoleDialogVisible = true;
+        // 请求当前用户数据
+        const resp = await this._service.get(`roles/${role.id}`);
+        const { data, meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          this.editRoleFrom.rid = data.roleId;
+          this.editRoleFrom.roleName = data.roleName;
+          this.editRoleFrom.roleDesc = data.roleDesc;
+        } else {
+          this.$message.error(msg);
+        }
+      },
+      // 更新用户信息
+      async updateRole() {
+        const resp = await this._service.put(`roles/${this.editRoleFrom.rid}`, this.editRoleFrom);
+        const { meta: { msg, status } } = resp.data;
+        if (status === 200) {
+          // 提示信息
+          // console.log(msg); //提示获取成功 ?
+          // this.$message.success(msg);
+          // 清除对话框内容
+          this.editRoleFrom= {
+            rid: -1,
+            roleName: "",
+            roleDesc: ""
+          };
+          // 重新加载 roleList
+          this.getRoleList();
+          // 关闭对话框
+          this.showEditRoleDialogVisible = false;
+        } else {
+          this.$message.error(msg);
+        }
+      },
+
+      // 显示删除角色对话框 + 删除
       showDelRoleDialog(role) {
         this.$confirm("此操作将永久删除角色?", "提示", {
           confirmButtonText: "确定",
