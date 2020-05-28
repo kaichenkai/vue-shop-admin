@@ -117,14 +117,14 @@
 <script>
   export default {
     name: "home",
-    beforeCreate() {
-      // 如果没有 token 值, 就不渲染 home 组件
-      // new Vue() 之前触发
-      const token = localStorage.getItem("token");
-      if (!token) {
-        this.$router.push({ name: "login" });
-      }
-    },
+    // beforeCreate() {
+    //   // 如果没有 token 值, 就不渲染 home 组件
+    //   // new Vue() 之前触发
+    //   const token = localStorage.getItem("token");
+    //   if (!token) {
+    //     this.$router.push({ name: "login" });
+    //   }
+    // },
     data() {
       return {
         MenuList: [],//菜单列表
