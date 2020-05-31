@@ -381,7 +381,7 @@
         let arr1 = this.$refs.tree.getCheckedKeys();
         let arr2 = this.$refs.tree.getHalfCheckedKeys();
         let rids = [...arr1, ...arr2];
-        const resp = this._service.post(`roles/${this.currentRoleId}/rights`, { rids: rids.toString() });
+        const resp = await this._service.post(`roles/${this.currentRoleId}/rights`, { rids: rids.toString() });
         console.log(resp);
         this.getRoleList();
         this.showSetRightsDialogVisible = false;
