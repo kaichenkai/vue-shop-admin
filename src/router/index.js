@@ -35,6 +35,11 @@ const routes = [
         path: "/roles",
         name: "roles",
         component: () => import("../components/rights/role.vue")
+      },
+      {
+        path: "/goods",//商品列表
+        name: "goods",
+        component: () => import("../components/goods/goodsList.vue")
       }
     ]
   }
@@ -44,7 +49,7 @@ const router = new VueRouter({
   routes
 });
 
-import {Message} from "element-ui";
+import { Message } from "element-ui";
 //配置路由导航守卫 (前置守卫)
 //在路由配置生效之前, 统一判断 token
 router.beforeEach((to, from, next) => {
@@ -60,8 +65,8 @@ router.beforeEach((to, from, next) => {
     if (!token) { //未登录
       Message.warning("请先登录");
       // next("/login")
-      router.push({name: 'login'});
-      return
+      router.push({ name: "login" });
+      return;
     }
   }
   //已登录, 放行

@@ -128,7 +128,7 @@
     data() {
       return {
         MenuList: [],//菜单列表
-        activePath: "roles",//默认激活导航
+        activePath: "goods",//默认激活导航
         iconObj: {
           "125": "iconfont icon-user",
           "103": "iconfont icon-tijikongjian",
