@@ -34,7 +34,7 @@
                             text-color="#fff"
                             active-text-color="#409FFF">   <!--默认选中-->
                         <!--一级菜单-->
-                        <el-submenu :index="item1.path" v-for="(item1, index1) in MenuList" :key="index1">
+                        <el-submenu :index="'/' + item1.path" v-for="(item1, index1) in MenuList" :key="index1">
                             <template slot="title">
                                 <i :class="iconObj[item1.id]"></i>
                                 <span>{{item1.authName}}</span>
@@ -42,7 +42,7 @@
                             <!-- 导航开启路由模式：
                                 将index值作为导航路由 -->
                             <!-- 二级菜单的模板区域 -->
-                            <el-menu-item :index="item2.path" v-for="(item2, index2) in item1.children" :key="index2">
+                            <el-menu-item :index="'/' + item2.path" v-for="(item2, index2) in item1.children" :key="index2">
                                 <i class="el-icon-menu"></i>
                                 <span>{{item2.authName}}</span>
                             </el-menu-item>
@@ -128,7 +128,7 @@
     data() {
       return {
         MenuList: [],//菜单列表
-        activePath: "goods",//默认激活导航
+        activePath: "/goods",//默认激活导航
         iconObj: {
           "125": "iconfont icon-user",
           "103": "iconfont icon-tijikongjian",

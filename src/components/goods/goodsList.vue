@@ -1,7 +1,7 @@
 <template>
     <el-card class="box-card">
         <el-breadcrumb separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item :to="{name: 'goods'}">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{name: 'root'}">首页</el-breadcrumb-item>
             <el-breadcrumb-item>商品管理</el-breadcrumb-item>
             <el-breadcrumb-item>商品列表</el-breadcrumb-item>
         </el-breadcrumb>
@@ -20,7 +20,7 @@
             </el-col>
             <!--添加商品-->
             <el-col :span=14 class="add-goods">
-                <el-button type="primary">添加商品</el-button>
+                <el-button type="primary" @click="addGoods()">添加商品</el-button>
             </el-col>
         </el-row>
         <!--表格数据渲染-->
@@ -158,6 +158,11 @@
       handleCurrentChange(pagenum) {
         this.pagenum = pagenum;
         this.getUserList();
+      },
+
+      //添加商品
+      addGoods() {
+        this.$router.push({name: "addGoods"})
       }
     }
   };
@@ -183,22 +188,6 @@
 
         .pagenation {
             margin: 34px 0;
-        }
-
-        .user-role-dialog {
-            .user-role-form {
-                .user-role {
-                    label {
-                        span {
-                            margin-left: 15px;
-                        }
-
-                        .el-select {
-                            margin-left: 15px;
-                        }
-                    }
-                }
-            }
         }
     }
 </style>

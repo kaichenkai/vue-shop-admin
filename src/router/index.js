@@ -19,7 +19,7 @@ const routes = [
     path: "/home",
     name: "home",
     component: () => import("../views/Home.vue"),
-    redirect: { name: "rights" },
+    redirect: { name: "goodsList" },
     children: [
       {
         path: "/users",
@@ -38,8 +38,13 @@ const routes = [
       },
       {
         path: "/goods",//商品列表
-        name: "goods",
+        name: "goodsList",
         component: () => import("../components/goods/goodsList.vue")
+      },
+      {
+        path: "/goods/add",//添加商品
+        name: "addGoods",
+        component: () => import("../components/goods/addGoods.vue")
       }
     ]
   }
