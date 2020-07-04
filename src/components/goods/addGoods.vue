@@ -16,13 +16,37 @@
         >
         </el-alert>
         <!--步骤条-->
+        <el-steps :active="activeStep"
+                  align-center
+                  style="margin: 20px 0"
+        >
+            <el-step title="基本信息"></el-step>
+            <el-step title="商品参数"></el-step>
+            <el-step title="商品属性"></el-step>
+            <el-step title="商品图片"></el-step>
+            <el-step title="商品内容"></el-step>
+            <el-step title="完成"></el-step>
+        </el-steps>
 
+        <!--tabs-->
+        <el-tabs class="tabs" tab-position="left" style="height: calc(100% - 200px)">
+            <el-tab-pane class="tab-pane" label="基本信息"><el-col>基本信息</el-col></el-tab-pane>
+            <el-tab-pane class="tab-pane" label="商品参数"><el-col>商品参数</el-col></el-tab-pane>
+            <el-tab-pane class="tab-pane" label="商品属性"><el-col>商品属性</el-col></el-tab-pane>
+            <el-tab-pane class="tab-pane" label="商品图片"><el-col>商品图片</el-col></el-tab-pane>
+            <el-tab-pane class="tab-pane" label="商品内容"><el-col>商品内容</el-col></el-tab-pane>
+        </el-tabs>
     </el-card>
 </template>
 
 <script>
   export default {
-    name: "addGoods"
+    name: "addGoods",
+    data() {
+      return {
+        activeStep: 0
+      };
+    }
   };
 </script>
 
@@ -31,6 +55,12 @@
         height: 100%;
         width: 100%;
         box-sizing: border-box;
+
+        .tabs {
+            .tab-pane {
+                margin-top: 10px;
+            }
+        }
     }
 </style>
 

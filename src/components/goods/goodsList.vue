@@ -46,23 +46,23 @@
             <el-table-column
                     prop="goods_price"
                     label="商品价格(元)"
-                    width="150">
+                    width="100">
             </el-table-column>
             <el-table-column
                     prop="goods_weight"
                     label="商品重量"
-                    width="150">
+                    width="100">
             </el-table-column>
             <el-table-column
                     prop="goods_number"
                     label="商品数量"
-                    width="150">
+                    width="100">
             </el-table-column>
 
             <!--prop="create_time"-->
             <el-table-column
                     label="创建日期"
-                    width="200">
+                    width="100">
                 <!--如果单元格内显示的内容不是文本字符串
                 需要给被显示的内容外层包裹一个 template 标签-->
 
@@ -157,7 +157,7 @@
       // },
       handleCurrentChange(pagenum) {
         this.pagenum = pagenum;
-        this.getUserList();
+        this.getGoodsList();
       },
 
       //添加商品
